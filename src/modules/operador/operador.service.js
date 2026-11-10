@@ -1,28 +1,45 @@
-import { AppDataSource } from '../../config/data-source.js';
+import { prisma } from '../../config/prisma.js';
 import { AppError } from '../../utils/AppError.js';
 
-const repo = AppDataSource.getRepository('Operador');
-
-export const operadorService = { 
+export const operadorService = {
   async listar() {
-    return await repo.find();
+    return await prisma.operador.findMany();
   },
+
   async obtenerPorId(id) {
-    const operador = await repo.findOneBy({ id: parseInt(id) });
-    if (!operador) throw new AppError(404, 'Operador no encontrado.');
+    const operador = await prisma.operador.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!operador) {
+      throw new AppError(404, 'Operador no encontrado.');
+    }
+
     return operador;
   },
+
   async crear(datos) {
-    return await repo.save(repo.create(datos));
+    return await prisma.operador.create({
+      data: datos,
+    });
   },
+
   async actualizar(id, datos) {
-    const operador = await this.obtenerPorId(id);
-    repo.merge(operador, datos);
-    return await repo.save(operador);
+    await this.obtenerPorId(id);
+
+    return await prisma.operador.update({
+      where: { id: parseInt(id) },
+      data: datos,
+    });
   },
+
   async eliminar(id) {
-    const operador = await this.obtenerPorId(id);
-    await repo.remove(operador);
+    await this.obtenerPorId(id);
+
+    await prisma.operador.delete({
+      where: { id: parseInt(id) },
+    });
+
     return true;
-  }
+  },
 };

@@ -1,0 +1,376 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// ENUMS DE CONTROL
+// ==========================================
+
+enum DistribucionEstado {
+  PENDIENTE
+  APROBADO
+  LIQUIDADO
+  RETENIDO
+}
+
+enum EquipoEstado {
+  DISPONIBLE
+  DANADO
+  PERDIDO
+  EN_USO
+}
+
+enum EventoEstado {
+  BORRADOR
+  PROGRAMADO
+  FINALIZADO
+  CANCELADO
+}
+
+enum MetodoPago {
+  TRANSFERENCIA
+  EFECTIVO
+  TARJETA
+}
+
+enum OperadorEstado {
+  ACTIVO
+  INACTIVO
+}
+
+enum PagoEstado {
+  PENDIENTE
+  PAGADO
+  RECHAZADO
+}
+
+enum Rol {
+  JEFE
+  JEFE_TECNICO
+  CONTADOR
+}
+
+enum TipoPago {
+  ANTICIPO
+  SALDO_TOTAL
+  ABONO
+}
+
+// ==========================================
+// MODELOS EN ORDEN ALFABÉTICO
+// ==========================================
+
+model Asignacion {
+  id          Int      @id @default(autoincrement())
+  eventoId    Int      @map("evento_id")
+  operadorId  Int      @map("operador_id")
+  horaInicio  DateTime @map("hora_inicio") @db.Time(6)
+  horaFin     DateTime @map("hora_fin") @db.Time(6)
+  observacion String?  @db.VarChar(255)
+
+  // Relaciones
+  evento    Evento              @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  operador  Operador            @relation(fields: [operadorId], references: [id], onDelete: Restrict)
+  funciones AsignacionFuncion[]
+
+  @@map("asignacion")
+}
+
+model AsignacionFuncion {
+  asignacionId Int @map("asignacion_id")
+  funcionId    Int @map("funcion_id")
+
+  // Relaciones
+  asignacion Asignacion @relation(fields: [asignacionId], references: [id], onDelete: Cascade)
+  funcion    Funcion    @relation(fields: [funcionId], references: [id], onDelete: Restrict)
+
+  @@id([asignacionId, funcionId])
+  @@map("asignacion_funcion")
+}
+
+model Ausencia {
+  id          Int      @id @default(autoincrement())
+  operadorId  Int      @map("operador_id")
+  fechaInicio DateTime @map("fecha_inicio") @db.Date
+  fechaFin    DateTime @map("fecha_fin") @db.Date
+  motivo      String?  @db.VarChar(255)
+
+  // Relaciones
+  operador Operador @relation(fields: [operadorId], references: [id], onDelete: Cascade)
+
+  @@map("ausencia")
+}
+
+model Auspicio {
+  id                  Int      @id @default(autoincrement())
+  eventoId            Int      @map("evento_id")
+  empresaAuspiciadoraId Int    @map("empresa_auspiciadora_id")
+  monto               Decimal  @db.Decimal(12, 2)
+
+  // Relaciones
+  evento              Evento              @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  empresaAuspiciadora EmpresaAuspiciadora @relation(fields: [empresaAuspiciadoraId], references: [id], onDelete: Restrict)
+
+  @@map("auspicio")
+}
+
+model Cliente {
+  id          Int      @id @default(autoincrement())
+  nombre      String   @db.VarChar(150)
+  telefono    String?  @db.VarChar(20)
+  rut         String?  @db.VarChar(12)
+  razonSocial String?  @map("razon_social") @db.VarChar(150)
+  direccion   String?  @db.VarChar(255)
+  
+  // Relaciones
+  eventos     Evento[]
+
+  @@map("cliente")
+}
+
+model DistribucionPago {
+  id                Int                @id @default(autoincrement())
+  eventoId          Int                @map("evento_id")
+  operadorId        Int                @map("operador_id")
+  perdidaId         Int?               @map("perdida_id")
+  monto             Decimal            @db.Decimal(12, 2)
+  porcentaje        Decimal?           @db.Decimal(5, 2)
+  fechaDistribucion DateTime           @map("fecha_distribucion") @db.Date
+  estado            DistribucionEstado @default(PENDIENTE)
+
+  // Relaciones
+  evento   Evento    @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  operador Operador  @relation(fields: [operadorId], references: [id], onDelete: Restrict)
+  perdida  Perdida?  @relation(fields: [perdidaId], references: [id], onDelete: SetNull)
+
+  @@map("distribucion_pago")
+}
+
+model EmpresaAuspiciadora {
+  id       Int      @id @default(autoincrement())
+  nombre   String   @db.VarChar(150)
+  contacto String?  @db.VarChar(100)
+  
+  // Relaciones
+  auspicios Auspicio[]
+
+  @@map("empresa_auspiciadora")
+}
+
+model Equipo {
+  id              Int          @id @default(autoincrement())
+  tipoId          Int          @map("tipo_id")
+  nombre          String       @db.VarChar(150)
+  estado          EquipoEstado @default(DISPONIBLE)
+  valorReposicion Decimal?     @map("valor_reposicion") @db.Decimal(10, 2)
+
+  // Relaciones
+  tipoEquipo    TipoEquipo     @relation(fields: [tipoId], references: [id], onDelete: Restrict)
+  kitEquipos    KitEquipo[]
+  eventoEquipos EventoEquipo[]
+  perdidas      Perdida[]
+
+  @@map("equipo")
+}
+
+model Evento {
+  id                Int          @id @default(autoincrement())
+  clienteId         Int          @map("cliente_id")
+  nombre            String       @db.VarChar(150)
+  tipo              String?      @db.VarChar(80)
+  fecha             DateTime     @db.Date
+  horaInicio        DateTime     @map("hora_inicio") @db.Time(6)
+  horaFin           DateTime     @map("hora_fin") @db.Time(6)
+  zona              String       @db.VarChar(100)
+  valorTotal        Decimal      @map("valor_total") @db.Decimal(12, 2)
+  porcentajeUtilidad Decimal     @map("porcentaje_utilidad") @db.Decimal(5, 2)
+  esRentable        Boolean?     @map("es_rentable")
+  estado            EventoEstado @default(PROGRAMADO)
+  notas             String?      @db.Text
+
+  // Relaciones
+  cliente            Cliente            @relation(fields: [clienteId], references: [id], onDelete: Restrict)
+  asignaciones       Asignacion[]
+  pagos              Pago[]
+  auspicios          Auspicio[]
+  gastos             Gasto[]
+  distribucionesPago DistribucionPago[]
+  eventoEquipos      EventoEquipo[]
+  eventoKits         EventoKit[]
+  perdidas           Perdida[]
+
+  @@map("evento")
+}
+
+model EventoEquipo {
+  eventoId Int @map("evento_id")
+  equipoId Int @map("equipo_id")
+  cantidad Int @default(1)
+
+  // Relaciones
+  evento Evento @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  equipo Equipo @relation(fields: [equipoId], references: [id], onDelete: Restrict)
+
+  @@id([eventoId, equipoId])
+  @@map("evento_equipo")
+}
+
+model EventoKit {
+  eventoId Int @map("evento_id")
+  kitId    Int @map("kit_id")
+  cantidad Int @default(1)
+
+  // Relaciones
+  evento Evento @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  kit    Kit    @relation(fields: [kitId], references: [id], onDelete: Restrict)
+
+  @@id([eventoId, kitId])
+  @@map("evento_kit")
+}
+
+model Funcion {
+  id          Int     @id @default(autoincrement())
+  nombre      String  @unique @db.VarChar(100)
+  descripcion String? @db.Text
+
+  // Relaciones
+  asignacionFunciones AsignacionFuncion[]
+  operadorFunciones   OperadorFuncion[]
+
+  @@map("funcion")
+}
+
+model Gasto {
+  id          Int      @id @default(autoincrement())
+  eventoId    Int      @map("evento_id")
+  descripcion String   @db.VarChar(255)
+  monto       Decimal  @db.Decimal(12, 2)
+  fecha       DateTime @db.Date
+
+  // Relaciones
+  evento Evento @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+
+  @@map("gasto")
+}
+
+model Kit {
+  id          Int     @id @default(autoincrement())
+  nombre      String  @unique @db.VarChar(150)
+  descripcion String? @db.Text
+
+  // Relaciones
+  kitEquipos  KitEquipo[]
+  eventoKits  EventoKit[]
+
+  @@map("kit")
+}
+
+model KitEquipo {
+  kitId    Int @map("kit_id")
+  equipoId Int @map("equipo_id")
+  cantidad Int @default(1)
+
+  // Relaciones
+  kit    Kit    @relation(fields: [kitId], references: [id], onDelete: Cascade)
+  equipo Equipo @relation(fields: [equipoId], references: [id], onDelete: Restrict)
+
+  @@id([kitId, equipoId])
+  @@map("kit_equipo")
+}
+
+model Operador {
+  id       Int            @id @default(autoincrement())
+  nombre   String         @db.VarChar(120)
+  rut      String?        @unique @db.VarChar(12)
+  telefono String?        @db.VarChar(20)
+  email    String?        @unique @db.VarChar(100)
+  estado   OperadorEstado @default(ACTIVO)
+
+  // Relaciones
+  asignaciones       Asignacion[]
+  ausencias          Ausencia[]
+  distribucionesPago DistribucionPago[]
+  funciones          OperadorFuncion[]
+
+  @@map("operador")
+}
+
+model OperadorFuncion {
+  operadorId Int @map("operador_id")
+  funcionId  Int @map("funcion_id")
+
+  // Relaciones
+  operador Operador @relation(fields: [operadorId], references: [id], onDelete: Cascade)
+  funcion  Funcion  @relation(fields: [funcionId], references: [id], onDelete: Cascade)
+
+  @@id([operadorId, funcionId])
+  @@map("operador_funcion")
+}
+
+model Pago {
+  id            Int        @id @default(autoincrement())
+  eventoId      Int        @map("evento_id")
+  montoTotal    Decimal    @map("monto_total") @db.Decimal(12, 2)
+  tipoPago      TipoPago   @map("tipo_pago")
+  estadoPago    PagoEstado @default(PENDIENTE) @map("estado_pago")
+  fechaEsperada DateTime   @map("fecha_esperada") @db.Date
+
+  // Relaciones
+  evento Evento      @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  abonos PagoAbono[]
+
+  @@map("pago")
+}
+
+model PagoAbono {
+  id         Int        @id @default(autoincrement())
+  pagoId     Int        @map("pago_id")
+  monto      Decimal    @db.Decimal(12, 2)
+  fechaPago  DateTime   @map("fecha_pago") @db.Date
+  metodoPago MetodoPago @map("metodo_pago")
+
+  // Relaciones
+  pago Pago @relation(fields: [pagoId], references: [id], onDelete: Cascade)
+
+  @@map("pago_abono")
+}
+
+model Perdida {
+  id          Int      @id @default(autoincrement())
+  eventoId    Int      @map("evento_id")
+  equipoId    Int      @map("equipo_id")
+  descripcion String   @db.Text
+  monto       Decimal  @db.Decimal(12, 2)
+  fecha       DateTime @db.Date
+
+  // Relaciones
+  evento             Evento             @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  equipo             Equipo             @relation(fields: [equipoId], references: [id], onDelete: Restrict)
+  distribucionesPago DistribucionPago[]
+
+  @@map("perdida")
+}
+
+model TipoEquipo {
+    id     Int    @id @default(autoincrement())
+    nombre String @unique @db.VarChar(100)
+    // Relaciones
+    equipos Equipo[]
+    @@map("tipo_equipo")
+
+}
+
+model Usuario {
+    id        Int      @id @default(autoincrement())
+    nombre    String   @db.VarChar(120)
+    email     String   @unique @db.VarChar(160)
+    password  String   @db.VarChar(100)
+    rol       Rol
+    createdAt DateTime @default(now()) @map("created_at")
+    @@map("usuario")
+}

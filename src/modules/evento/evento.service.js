@@ -1,33 +1,50 @@
-import { AppDataSource } from '../../config/data-source.js';
+import { prisma } from '../../config/prisma.js';
 import { AppError } from '../../utils/AppError.js';
-
-const repo = AppDataSource.getRepository('Evento');
 
 export const eventoService = {
   async listar() {
-    // Retornamos los eventos trayendo los datos del cliente y tipo vinculados
-    return await repo.find({ relations: ['cliente', 'tipoEvento'] });
-  },
-  async obtenerPorId(id) {
-    const evento = await repo.findOne({
-      where: { id: parseInt(id) },
-      relations: ['cliente', 'tipoEvento']
+    return await prisma.evento.findMany({
+      include: { cliente: true },
     });
-    if (!evento) throw new AppError(404, 'El evento solicitado no existe.');
+  },
+
+  async obtenerPorId(id) {
+    const evento = await prisma.evento.findUnique({
+      where: { id: parseInt(id) },
+      include: { cliente: true },
+    });
+
+    if (!evento) {
+      throw new AppError(404, 'El evento solicitado no existe.');
+    }
+
     return evento;
   },
+
   async crear(datos) {
-    const nuevoEvento = repo.create(datos);
-    return await repo.save(nuevoEvento);
+    return await prisma.evento.create({
+      data: datos,
+      include: { cliente: true },
+    });
   },
+
   async actualizar(id, datos) {
-    const evento = await this.obtenerPorId(id);
-    repo.merge(evento, datos);
-    return await repo.save(evento);
+    await this.obtenerPorId(id);
+
+    return await prisma.evento.update({
+      where: { id: parseInt(id) },
+      data: datos,
+      include: { cliente: true },
+    });
   },
+
   async eliminar(id) {
-    const evento = await this.obtenerPorId(id);
-    await repo.remove(evento);
+    await this.obtenerPorId(id);
+
+    await prisma.evento.delete({
+      where: { id: parseInt(id) },
+    });
+
     return true;
-  }
+  },
 };

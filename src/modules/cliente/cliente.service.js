@@ -1,35 +1,45 @@
-import { AppDataSource } from '../../config/data-source.js';
+import { prisma } from '../../config/prisma.js';
 import { AppError } from '../../utils/AppError.js';
-
-const clienteRepository = AppDataSource.getRepository('Cliente');
 
 export const clienteService = {
   async listar() {
-    return await clienteRepository.find();
+    return await prisma.cliente.findMany();
   },
 
   async obtenerPorId(id) {
-    const cliente = await clienteRepository.findOneBy({ id: parseInt(id) });
+    const cliente = await prisma.cliente.findUnique({
+      where: { id: parseInt(id) },
+    });
+
     if (!cliente) {
       throw new AppError(404, `El cliente con ID ${id} no existe en el sistema.`);
     }
+
     return cliente;
   },
 
   async crear(datos) {
-    const nuevoCliente = clienteRepository.create(datos);
-    return await clienteRepository.save(nuevoCliente);
+    return await prisma.cliente.create({
+      data: datos,
+    });
   },
 
   async actualizar(id, datos) {
-    const cliente = await this.obtenerPorId(id);
-    clienteRepository.merge(cliente, datos);
-    return await clienteRepository.save(cliente);
+    await this.obtenerPorId(id);
+
+    return await prisma.cliente.update({
+      where: { id: parseInt(id) },
+      data: datos,
+    });
   },
 
   async eliminar(id) {
-    const cliente = await this.obtenerPorId(id);
-    await clienteRepository.remove(cliente);
+    await this.obtenerPorId(id);
+
+    await prisma.cliente.delete({
+      where: { id: parseInt(id) },
+    });
+
     return true;
-  }
+  },
 };

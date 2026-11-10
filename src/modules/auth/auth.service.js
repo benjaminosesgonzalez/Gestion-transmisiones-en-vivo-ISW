@@ -1,17 +1,14 @@
-import { AppDataSource } from '../../config/data-source.js';
+import { prisma } from '../../config/prisma.js';
 import { comparePassword } from '../../utils/hash.js';
 import { generarToken } from '../../utils/jwt.js';
 
-const usuarioRepository = AppDataSource.getRepository('Usuario');
-
 export const authService = {
-
   async login(email, password) {
-    // Buscamos al usuario incluyendo explícitamente el password
-    const usuario = await usuarioRepository.createQueryBuilder('usuario')
-      .addSelect('usuario.password')
-      .where('usuario.email = :email', { email })
-      .getOne();
+    // Buscamos al usuario anulando el 'omit' global para poder verificar su contraseña
+    const usuario = await prisma.usuario.findUnique({
+      where: { email },
+      omit: { password: false },
+    });
 
     if (!usuario) {
       return null;
@@ -26,17 +23,17 @@ export const authService = {
     // Preparamos los datos del token
     const payload = {
       id: usuario.id,
-      rol: usuario.rol
+      rol: usuario.rol,
     };
 
     const token = generarToken(payload);
 
-    // Removemos la contraseña del objeto de respuesta por seguridad
-    delete usuario.password;
+    // Extraemos la contraseña para que jamás viaje en el objeto de retorno
+    const { password: _, ...usuarioSinPassword } = usuario;
 
     return {
       token,
-      usuario
+      usuario: usuarioSinPassword,
     };
-  }
+  },
 };

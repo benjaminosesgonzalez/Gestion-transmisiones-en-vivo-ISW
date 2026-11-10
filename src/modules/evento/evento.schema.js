@@ -1,17 +1,35 @@
 import { z } from 'zod';
 
+const timeRegex = /^\d{2}:\d{2}(:\d{2})?$/;
+
+const parseTimeToDate = (timeStr) => {
+  const normalized = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
+  return new Date(`1970-01-01T${normalized}Z`);
+};
+
 export const crearEventoSchema = z.object({
-  cliente_id: z.number().int('ID de cliente inválido'),
-  tipo_id: z.number().int('ID de tipo de evento inválido'),
+  clienteId: z.number().int('ID de cliente inválido'),
   nombre: z.string().min(5).max(150),
-  fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de fecha debe ser YYYY-MM-DD'),
-  hora_inicio: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, 'Formato de hora de inicio inválido (HH:MM)'),
-  hora_fin: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, 'Formato de hora de fin inválido (HH:MM)'),
+  tipo: z.string().max(80).nullable().optional(),
+  fecha: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de fecha debe ser YYYY-MM-DD')
+    .transform((val) => new Date(`${val}T00:00:00Z`)),
+  horaInicio: z
+    .string()
+    .regex(timeRegex, 'Formato de hora de inicio inválido (HH:MM)')
+    .transform(parseTimeToDate),
+  horaFin: z
+    .string()
+    .regex(timeRegex, 'Formato de hora de fin inválido (HH:MM)')
+    .transform(parseTimeToDate),
   zona: z.string().max(100),
-  valor_total: z.number().positive('El valor total debe ser un número positivo'),
-  porcentaje_utilidad: z.number().min(0).max(100),
-  es_rentable: z.boolean().nullable().optional(), // Nullable tal como lo definimos
-  estado: z.enum(['PROGRAMADO', 'FINALIZADO', 'CANCELADO']).default('PROGRAMADO'),
+  valorTotal: z.number().positive('El valor total debe ser un número positivo'),
+  porcentajeUtilidad: z.number().min(0).max(100),
+  esRentable: z.boolean().nullable().optional(),
+  estado: z
+    .enum(['BORRADOR', 'PROGRAMADO', 'FINALIZADO', 'CANCELADO'])
+    .default('PROGRAMADO'),
   notas: z.string().nullable().optional(),
 });
 
