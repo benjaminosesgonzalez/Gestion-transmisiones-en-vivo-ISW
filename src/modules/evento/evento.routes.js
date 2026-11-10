@@ -8,11 +8,11 @@ import { crearEventoSchema, actualizarEventoSchema } from './evento.schema.js';
 const router = Router();
 router.use(verificarAuth);
 
-// Lectura de eventos para roles de supervisión y finanzas
+// Roles de supervisión y finanzas pueden auditar la lista de transmisiones
 router.get('/', requiereRol('JEFE', 'JEFE_TECNICO', 'CONTADOR'), eventoController.listar);
 router.get('/:id', requiereRol('JEFE', 'JEFE_TECNICO', 'CONTADOR'), eventoController.obtenerPorId);
 
-// Modificaciones exclusivas de la jefatura
+// Modificaciones operativas estratégicas exclusivas de la jefatura (JEFE)
 router.post('/', requiereRol('JEFE'), validar(crearEventoSchema), eventoController.crear);
 router.put('/:id', requiereRol('JEFE'), validar(actualizarEventoSchema), eventoController.actualizar);
 router.delete('/:id', requiereRol('JEFE'), eventoController.eliminar);

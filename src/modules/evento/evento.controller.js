@@ -2,18 +2,56 @@ import { eventoService } from './evento.service.js';
 
 export const eventoController = {
   async listar(req, res, next) {
-    try { return res.json(await eventoService.listar()); } catch (e) { return next(e); }
+    try {
+      const eventos = await eventoService.listar();
+      return res.status(200).json(eventos);
+    } catch (e) {
+      return next(e);
+    }
   },
+
   async obtenerPorId(req, res, next) {
-    try { return res.json(await eventoService.obtenerPorId(req.params.id)); } catch (e) { return next(e); }
+    try {
+      const evento = await eventoService.obtenerPorId(req.params.id);
+      return res.status(200).json(evento);
+    } catch (e) {
+      return next(e);
+    }
   },
+
   async crear(req, res, next) {
-    try { return res.status(201).json(await eventoService.crear(req.body)); } catch (e) { return next(e); }
+    try {
+      const nuevoEvento = await eventoService.crear(req.body);
+      // Retornamos el código 201 Created junto al evento y sus pagos automatizados
+      return res.status(201).json({
+        status: 'success',
+        message: 'Evento registrado exitosamente.',
+        data: nuevoEvento
+      });
+    } catch (e) {
+      return next(e);
+    }
   },
+
   async actualizar(req, res, next) {
-    try { return res.json(await eventoService.actualizar(req.params.id, req.body)); } catch (e) { return next(e); }
+    try {
+      const eventoActualizado = await eventoService.actualizar(req.params.id, req.body);
+      return res.status(200).json({
+        status: 'success',
+        message: 'Evento actualizado exitosamente.',
+        data: eventoActualizado
+      });
+    } catch (e) {
+      return next(e);
+    }
   },
+
   async eliminar(req, res, next) {
-    try { await eventoService.eliminar(req.params.id); return res.status(204).send(); } catch (e) { return next(e); }
+    try {
+      await eventoService.eliminar(req.params.id);
+      return res.status(204).send();
+    } catch (e) {
+      return next(e);
+    }
   }
 };
