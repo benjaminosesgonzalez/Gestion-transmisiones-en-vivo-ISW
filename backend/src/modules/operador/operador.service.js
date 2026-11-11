@@ -5,12 +5,48 @@ export const operadorService = {
   async listar() {
     return await prisma.operador.findMany({
       include: {
-        funciones: {
-          include: { funcion: true }
-        }
+        funciones: { include: { funcion: true } },
+        ausencias: true,
       },
-      orderBy: { nombre: 'asc' }
+      orderBy: { nombre: 'asc' },
     });
+  },
+  
+  async asignarFunciones(operadorId, funcionIds) {
+  const idOp = parseInt(operadorId);
+
+    return await prisma.$transaction(async (tx) => {
+      await tx.operadorFuncion.deleteMany({
+        where: { operadorId: idOp },
+      });
+
+      if (funcionIds && funcionIds.length > 0) {
+        await tx.operadorFuncion.createMany({
+          data: funcionIds.map((fId) => ({
+            operadorId: idOp,
+            funcionId: parseInt(fId),
+          })),
+        });
+      }
+
+      return await tx.operador.findUnique({
+        where: { id: idOp },
+        include: { funciones: { include: { funcion: true } } },
+      });
+    });
+  },
+
+  async eliminarAusencia(ausenciaId) {
+    const ausencia = await prisma.ausencia.findUnique({
+      where: { id: parseInt(ausenciaId) },
+    });
+    if (!ausencia) {
+      throw new AppError(404, 'El registro de ausencia no existe.');
+    }
+    await prisma.ausencia.delete({
+      where: { id: parseInt(ausenciaId) },
+    });
+    return true;
   },
 
   async obtenerPorId(id) {

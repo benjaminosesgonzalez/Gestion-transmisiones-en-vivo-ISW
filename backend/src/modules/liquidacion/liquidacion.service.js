@@ -9,6 +9,13 @@ export const liquidacionService = {
     });
   },
 
+    async listarIncidentes() {
+    return await prisma.perdida.findMany({
+      include: { evento: true, equipo: true },
+      orderBy: { fecha: 'desc' },
+    });
+  },
+  
   // --- REGISTRAR DAÑO O PÉRDIDA EN UN EVENTO ---
   async registrarPerdida(datos) {
     return await prisma.$transaction(async (tx) => {

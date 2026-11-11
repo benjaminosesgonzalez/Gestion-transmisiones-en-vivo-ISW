@@ -83,6 +83,7 @@ export const Sidebar = () => {
         { nombre: 'PAGOS', ruta: '/contador/finanzas' },
         { nombre: 'GASTOS', ruta: '/contador/gastos' },
         { nombre: 'PÉRDIDAS', ruta: '/contador/perdidas' },
+        { nombre: 'LIQUIDACIONES', ruta: '/contador/liquidaciones' },
       ],
     },
   ];
@@ -99,13 +100,17 @@ export const Sidebar = () => {
     <aside className="w-60 h-screen bg-[#1c1c1e] border-r border-[#2e2e32] flex flex-col justify-between text-neutral-300 select-none shrink-0">
       <div className="overflow-y-auto">
         {/* Marca Superior */}
-        <div className="h-14 px-5 flex items-center gap-3 border-b border-[#2e2e32]">
-          <svg className="w-6 h-6 text-[#5b73e8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <div className="h-16 px-4 flex items-center gap-3 border-b border-[#2e2e32]">
+          <svg className="w-6 h-6 text-[#5b73e8] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
           </svg>
-          <div className="leading-tight">
-            <span className="block text-xs font-extrabold tracking-wider text-[#5b73e8]">EMPRESA</span>
-            <span className="block text-xs font-extrabold tracking-wider text-[#5b73e8]">EVENTOS</span>
+          <div className="leading-snug">
+            <span className="block text-[11px] font-extrabold tracking-wider text-neutral-200 uppercase">
+              GESTIÓN DE
+            </span>
+            <span className="block text-[11px] font-extrabold tracking-wider text-neutral-200 uppercase">
+              TRANSMISIONES EN VIVO
+            </span>
           </div>
         </div>
 

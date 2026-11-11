@@ -16,11 +16,20 @@ export const operadorController = {
   async eliminar(req, res, next) {
     try { await operadorService.eliminar(req.params.id); return res.status(204).send(); } catch (e) { return next(e); }
   },
+  
+  async eliminarAusencia(req, res, next) {
+    try {
+      await operadorService.eliminarAusencia(req.params.ausenciaId);
+      return res.status(204).send();
+    } catch (e) {
+      return next(e);
+    }
+  },
 
   // Controles avanzados
   async asignarFunciones(req, res, next) {
     try {
-      const resultado = await operadorService.assignarFunciones(req.params.id, req.body.funcionIds);
+      const resultado = await operadorService.asignarFunciones(req.params.id, req.body.funcionIds);
       return res.status(200).json(resultado);
     } catch (e) { return next(e); }
   },

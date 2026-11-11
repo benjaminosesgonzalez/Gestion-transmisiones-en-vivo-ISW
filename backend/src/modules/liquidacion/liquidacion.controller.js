@@ -8,6 +8,15 @@ export const liquidacionController = {
     } catch (error) { return next(error); }
   },
 
+    async listarIncidentes(req, res, next) {
+    try {
+      const incidentes = await liquidacionService.listarIncidentes();
+      return res.status(200).json(incidentes);
+    } catch (error) {
+      return next(error);
+    }
+  },
+  
   async registrarPerdida(req, res, next) {
     try {
       const nuevoIncidente = await liquidacionService.registrarPerdida(req.body);

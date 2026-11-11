@@ -13,12 +13,17 @@ import gastoRoutes from './modules/gasto/gasto.routes.js';
 import asignacionRoutes from './modules/asignacion/asignacion.routes.js';
 import despachoRoutes from './modules/despacho/despacho.routes.js';
 import liquidacionRoutes from './modules/liquidacion/liquidacion.routes.js';
+import pagoRoutes from './modules/pago/pago.routes.js';
+import auspiciadorRoutes from './modules/auspiciador/auspiciador.routes.js';
 
 const app = express();
 
 // Middlewares Globales
 app.use(cors());
 app.use(express.json());
+
+// Permite visualizar los PDF/imágenes subidos desde el navegador
+app.use('/uploads', express.static('uploads'));
 
 // Enrutadores de la API
 app.use('/api/auth', authRoutes);
@@ -29,10 +34,12 @@ app.use('/api/eventos', eventoRoutes);
 app.use('/api/funciones', funcionRoutes);
 app.use('/api/kits', kitRoutes);
 app.use('/api/operadores', operadorRoutes); 
+app.use('/api/pagos', pagoRoutes);
 app.use('/api/tipos-equipo', tipoEquipoRoutes);
 app.use('/api/gastos', gastoRoutes);
 app.use('/api/asignaciones', asignacionRoutes);
 app.use('/api/liquidaciones', liquidacionRoutes);
+app.use('/api/auspiciadores', auspiciadorRoutes);
 
 // Captura global de errores
 app.use(errorMiddleware);

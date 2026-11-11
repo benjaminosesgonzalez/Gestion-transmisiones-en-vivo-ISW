@@ -7,6 +7,16 @@ import { Header } from './components/ui/Header.jsx';
 import { DashboardJefeTecnico } from './pages/DashboardJefeTecnico.jsx';
 import { KitsPage } from './pages/KitsPage.jsx';
 import { TiposEquipoPage } from './pages/TiposEquipoPage.jsx';
+import { DashboardContador } from './pages/DashboardContador.jsx';
+import { GastosPage } from './pages/GastosPage.jsx';
+import { PerdidasPage } from './pages/PerdidasPage.jsx';
+import { LiquidacionesPage } from './pages/LiquidacionesPage.jsx';
+import { OperadoresPage } from './pages/OperadoresPage.jsx';
+import { AusenciasPage } from './pages/AusenciasPage.jsx';
+import { ClientesPage } from './pages/ClientesPage.jsx';
+import { AuspiciadoresPage } from './pages/AuspiciadoresPage.jsx';
+import { EventosPage } from './pages/EventosPage.jsx';
+import { AsignacionesPage } from './pages/AsignacionesPage.jsx';
 
 const MainLayout = () => (
   <div className="flex h-screen bg-[#18181a] text-neutral-200 overflow-hidden">
@@ -37,8 +47,12 @@ export default function App() {
         <Route element={<ProtectedRoute allowedRoles={['JEFE']} />}>
           {/* 2. Reemplazar el placeholder por la vista real */}
           <Route path="/jefe/dashboard" element={<DashboardJefe />} />
-          <Route path="/clientes" element={<PlaceholderVista titulo="Gestión de Clientes" />} />
-          <Route path="/jefe/asignaciones" element={<PlaceholderVista titulo="Asignaciones Operativas" />} />
+          <Route path="/jefe/operadores" element={<OperadoresPage />} />
+          <Route path="/jefe/ausencias" element={<AusenciasPage />} />
+          <Route path="/clientes" element={<ClientesPage />} />
+          <Route path="/jefe/auspiciadores" element={<AuspiciadoresPage />} />
+          <Route path="/jefe/eventos" element={<EventosPage />} />
+          <Route path="/jefe/asignaciones" element={<AsignacionesPage />} />
         </Route>
 
         {/* Terminal Jefe Técnico */}
@@ -50,8 +64,12 @@ export default function App() {
 
         {/* Terminal Contador */}
         <Route element={<ProtectedRoute allowedRoles={['JEFE', 'CONTADOR']} />}>
-          <Route path="/contador/finanzas" element={<PlaceholderVista titulo="Auditoría Financiera y Egresos" />} />
+          <Route path="/contador/finanzas" element={<DashboardContador />} />
+          <Route path="/contador/gastos" element={<GastosPage />} />
+          <Route path="/contador/perdidas" element={<PerdidasPage />} />
+          <Route path="/contador/liquidaciones" element={<LiquidacionesPage />} />
         </Route>
+
       </Route>
 
       <Route path="*" element={<Navigate to="/login" replace />} />
