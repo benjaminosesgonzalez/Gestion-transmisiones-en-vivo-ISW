@@ -19,7 +19,12 @@ import auspiciadorRoutes from './modules/auspiciador/auspiciador.routes.js';
 const app = express();
 
 // Middlewares Globales
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN || '*',
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Permite visualizar los PDF/imágenes subidos desde el navegador
