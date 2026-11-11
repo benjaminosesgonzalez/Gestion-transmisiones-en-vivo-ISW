@@ -1,23 +1,23 @@
 export const DataTable = ({ columns, data, emptyMessage = 'No hay registros disponibles.' }) => {
   return (
-    <div className="w-full overflow-x-auto bg-slate-900 border border-slate-800 rounded-xl">
+    <div className="w-full overflow-x-auto bg-[#1c1c1e] border border-[#2e2e32] rounded-lg">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="border-b border-slate-800 bg-slate-950/50">
+          <tr className="border-b border-[#2e2e32] bg-[#18181a]/60">
             {columns.map((col, idx) => (
               <th
                 key={idx}
-                className="py-3.5 px-4 text-[11px] font-semibold uppercase tracking-wider text-slate-400"
+                className="py-3 px-4 text-[10px] font-bold uppercase tracking-wider text-neutral-400"
               >
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-800/70 text-xs text-slate-300">
+        <tbody className="divide-y divide-[#2e2e32] text-xs text-neutral-300">
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="py-8 text-center text-slate-500">
+              <td colSpan={columns.length} className="py-8 text-center text-neutral-500">
                 {emptyMessage}
               </td>
             </tr>
@@ -25,7 +25,7 @@ export const DataTable = ({ columns, data, emptyMessage = 'No hay registros disp
             data.map((row, rowIdx) => (
               <tr
                 key={row.id || rowIdx}
-                className="hover:bg-slate-800/40 transition-colors"
+                className="hover:bg-[#252528]/60 transition-colors"
               >
                 {columns.map((col, colIdx) => (
                   <td key={colIdx} className="py-3.5 px-4 whitespace-nowrap">

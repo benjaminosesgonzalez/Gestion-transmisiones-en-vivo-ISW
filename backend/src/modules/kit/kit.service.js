@@ -77,6 +77,12 @@ export const kitService = {
 
     const equipoIds = listaEquipos.map((e) => e.equipoId);
 
+    // Regla de Negocio: Cada ID de Equipo representa 1 pieza física única en inventario
+    const excedeStockFisico = listaEquipos.some((e) => e.cantidad > 1);
+    if (excedeStockFisico) {
+      throw new AppError(400, 'Cada equipo del inventario representa 1 unidad física única, la cantidad máxima por ítem en un kit es 1.');
+    }
+
     const equiposExistentes = await prisma.equipo.findMany({
       where: { id: { in: equipoIds } },
     });

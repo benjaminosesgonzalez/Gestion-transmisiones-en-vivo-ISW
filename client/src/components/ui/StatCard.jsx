@@ -1,29 +1,29 @@
-export const StatCard = ({ titulo, valor, subtitulo, icon, accent = 'purple' }) => {
+export const StatCard = ({ titulo, valor, subtitulo, icon, accent = 'indigo' }) => {
   const accents = {
-    purple: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+    indigo: 'text-[#5b73e8] bg-[#5b73e8]/10 border-[#5b73e8]/20',
     emerald: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
     amber: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
     rose: 'text-rose-400 bg-rose-500/10 border-rose-500/20',
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-start justify-between hover:border-slate-700 transition-colors">
+    <div className="bg-[#1c1c1e] border border-[#2e2e32] rounded-lg p-5 flex items-start justify-between hover:border-neutral-700 transition-colors">
       <div className="space-y-1.5">
-        <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+        <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
           {titulo}
         </p>
-        <p className="text-2xl font-bold text-white tracking-tight">
+        <p className="text-2xl font-extrabold text-white tracking-tight">
           {valor}
         </p>
         {subtitulo && (
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-neutral-500">
             {subtitulo}
           </p>
         )}
       </div>
 
       {icon && (
-        <div className={`p-2.5 rounded-lg border ${accents[accent] || accents.purple}`}>
+        <div className={`p-2.5 rounded-md border ${accents[accent] || accents.indigo}`}>
           {icon}
         </div>
       )}

@@ -109,25 +109,27 @@ export const Sidebar = () => {
           </div>
         </div>
 
-        {/* Botón INICIO */}
-        <div className="p-3">
-          <Link
-            to={rutaInicio}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-xs font-semibold tracking-wider transition-colors ${
-              location.pathname === rutaInicio
-                ? 'bg-[#2a2d3d] text-[#788ef5]'
-                : 'text-neutral-400 hover:bg-[#252528] hover:text-white'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            INICIO
-          </Link>
-        </div>
+        {/* Botón INICIO: Visible únicamente para el JEFE que tiene Dashboard General */}
+        {user?.rol === 'JEFE' && (
+          <div className="p-3 pb-1">
+            <Link
+              to="/jefe/dashboard"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-xs font-semibold tracking-wider transition-colors ${
+                location.pathname === '/jefe/dashboard'
+                  ? 'bg-[#2a2d3d] text-[#788ef5]'
+                  : 'text-neutral-400 hover:bg-[#252528] hover:text-white'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              INICIO
+            </Link>
+          </div>
+        )}
 
         {/* Acordeones por Categoría */}
-        <nav className="px-3 space-y-2">
+        <nav className="px-3 pt-3 space-y-2">
           {gruposFiltrados.map((grupo) => {
             const estaAbierto = abiertos[grupo.grupo];
             return (
